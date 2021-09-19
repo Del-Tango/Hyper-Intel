@@ -1,0 +1,53 @@
+#!/bin/bash
+#
+# Regards, the Alveare Solutions society.
+#
+declare -A HI_DEFAULT
+declare -A HI_LIB
+declare -A HI_SOURCE
+declare -A HI_CARGO
+
+# [ NOTE ]: Absolute directory path the current file is in.
+HI_DIRECTORY="$(
+    cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd
+)"
+CONF_FILE_PATH="$HI_DIRECTORY/conf/hyper-intel.conf"
+
+if [ ! -f "$CONF_FILE_PATH" ]; then
+    echo "[ WARNING ]: Config file ($CONF_FILE_PATH) not found."
+    return 1
+else
+    source "$CONF_FILE_PATH"
+fi
+
+for script in ${!HI_SOURCE[@]}; do
+    source ${HI_SOURCE[$script]}
+    if [ $? -ne 0 ]; then
+        echo "[ NOK ]: Something went wrong."\
+            "Could not load ($script) script."
+    else
+        echo "[ OK ]: Successfully loaded ($script) script."
+    fi
+done
+
+for library in ${!HI_LIB[@]}; do
+    source ${HI_LIB[$library]}
+    if [ $? -ne 0 ]; then
+        echo "[ NOK ]: Something went wrong."\
+            "Could not load ($library) library."
+    else
+        echo "[ OK ]: Successfully loaded ($library) library."
+    fi
+done
+
+# MISCELLANEOUS
+
+function init_hyper_intel () {
+    project_setup
+    display_banners
+    init_menu 'MainController'
+    return $?
+}
+
+init_hyper_intel $@
+exit $?
