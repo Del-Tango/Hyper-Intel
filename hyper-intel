@@ -44,8 +44,23 @@ done
 
 function init_hyper_intel () {
     project_setup
-    display_banners
-    init_menu 'MainController'
+
+    if [ $# -eq 0 ]; then
+        display_banners
+        init_menu 'MainController'
+        return $?
+    fi
+
+    for opt in $@; do
+        case "$opt" in
+            -c|--client)
+                display_banners
+                action_hyper_intel_browse_procedures $@
+                break
+                ;;
+        esac
+    done
+
     return $?
 }
 
